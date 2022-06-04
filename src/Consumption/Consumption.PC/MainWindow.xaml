@@ -32,7 +32,7 @@
     <materialDesign:DialogHost Identifier="Root" IsOpen="{Binding DialogIsOpen}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
+                <RowDefinition Height="50" />
                 <RowDefinition Height="auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
@@ -40,7 +40,7 @@
             <!--  System Title  -->
             <materialDesign:ColorZone
                 x:Name="ColorZone"
-                Padding="10"
+                Padding="0"
                 VerticalAlignment="Top"
                 materialDesign:ShadowAssist.ShadowDepth="Depth0"
                 BorderThickness="0"

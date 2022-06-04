@@ -1,6 +1,7 @@
 namespace Consumption.Api
 {
     using System;
+    using System.IO;
     using System.Reflection;
     using AutoMapper;
     using Consumption.Api.ApiManager;
@@ -9,8 +10,10 @@ namespace Consumption.Api
     using Consumption.EFCore.Context;
     using Consumption.Shared.DataInterfaces;
     using Consumption.Shared.DataModel;
+    using IGeekFan.AspNetCore.Knife4jUI;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -100,7 +103,20 @@ namespace Consumption.Api
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = ".NET Core WebApi v1", Version = "v1" });
+               // options.SwaggerDoc("v1", new OpenApiInfo { Title = "API V1", Version = "v1" });
+                options.AddServer(new OpenApiServer()
+                {
+                    Url = "url",
+                    Description = "Description"
+                });
+                options.CustomOperationIds(apiDesc =>
+                {
+                    var controllerAction = apiDesc.ActionDescriptor as ControllerActionDescriptor;
+                    return controllerAction.ControllerName + "-" + controllerAction.ActionName;
+                });
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "SwaggerDemo.xml"), true);
             });
+
         }
 
         /// <summary>
@@ -125,16 +141,26 @@ namespace Consumption.Api
             app.UseRouting();
             app.UseAuthorization();
             app.UseSwagger();
-            app.UseSwaggerUI(options =>
+            app.UseKnife4UI(c =>
             {
-                options.ShowExtensions();
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", ".NET Core WebApi v1");
+                c.RoutePrefix = "swagger"; // serve the UI at root
+                c.SwaggerEndpoint("/v1/api-docs", "V1 Docs");
             });
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapSwagger();
+                endpoints.MapSwagger("{documentName}/api-docs");
             });
+            //app.UseSwaggerUI(options =>
+            //{
+            //    options.ShowExtensions();
+            //    options.SwaggerEndpoint("/swagger/v1/swagger.json", ".NET Core WebApi v1");
+            //});
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapControllers();
+            //    endpoints.MapSwagger();
+            //});
         }
     }
 }
